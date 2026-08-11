@@ -16,3 +16,25 @@ const connection = mysql.createConnection({
   password: "your_root_password",
   database: "blog_db",
 });
+
+# to connect with DB
+
+    // WAY 1
+  createConnection()
+Node.js
+   │
+   └────── 1 connection ────── MySQL
+
+   // WAY 2
+  createPool()
+                    ┌── connection 1 ──┐
+Node.js ────────────┼── connection 2 ──┼── MySQL
+                    ├── connection 3 ──┤
+                    └── connection 4 ──┘
+
+                    createConnection()	  createPool()
+Connections	          One	                Multiple/reusable
+Concurrent requests	  Limited	            Better
+Reuses connections	  ❌	                  ✅
+Good for Express API	Okay for small apps	  Recommended
+Production	          Usually not ideal	    Recommended
