@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise"
 
+//  Connection Pool ->  A pool reuses a set of open connections instead of opening a new one for every query
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -9,6 +10,7 @@ const pool = mysql.createPool({
 
     connectionLimit : 10,
     waitForConnections :true,
+    queueLimit : 0,
 })
 
 const connectDB = async () => {
@@ -16,13 +18,15 @@ const connectDB = async () => {
         const connection = await pool.getConnection();
 
         console.log("MySQL connected successfully");
+        console.log(`DB host : ${connection.config.host}, DB : ${connection.config.database}`);
+        
 
-        connection.release();
+        connection.release();    // return it to the pool, don't close the pool
     } catch (error) {
         console.error("MySQL connection failed:", error);
-
         process.exit(1);
     }
 };
 
-export default connectDB
+export { pool };
+export default connectDB;
