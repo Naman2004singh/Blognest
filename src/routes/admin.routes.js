@@ -12,11 +12,20 @@ import { ROLES } from "../constants.js";
 
 const router = Router();
 
-// Every route here requires a logged-in SUPER ADMIN.
-router.use(verifyJWT, authorizeRoles(ROLES.SUPERADMIN));
+// All admin routes require login.
+router.use(verifyJWT);
 
-router.route("/users").get(listUsers);
-router.route("/admins").post(validate(createAdminSchema), createAdmin);
-router.route("/users/:id").delete(deleteUser);
+// List users — admin AND super admin.
+router.route("/users").get(authorizeRoles(ROLES.ADMIN, ROLES.SUPERADMIN), listUsers);
+
+// Delete a user 
+router
+    .route("/users/:id")
+    .delete(authorizeRoles(ROLES.ADMIN, ROLES.SUPERADMIN), deleteUser);
+
+// Create an admin — SUPER ADMIN ONLY.
+router
+    .route("/admins")
+    .post(authorizeRoles(ROLES.SUPERADMIN), validate(createAdminSchema), createAdmin);
 
 export default router;

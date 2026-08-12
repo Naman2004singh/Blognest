@@ -2,11 +2,12 @@
     <div class="flex items-center justify-between mb-10">
         <div>
             <h1 class="font-display text-4xl font-semibold">Admin</h1>
-            <p class="text-ink/50 mt-1">Manage every story on BlogNest.</p>
+            <p class="text-ink/50 mt-1">Manage members and every story on BlogNest.</p>
         </div>
         <a href="/blogs/new" class="bg-ink text-paper font-medium px-5 py-2.5 rounded-full hover:bg-moss transition text-sm">Write a story</a>
     </div>
 
+    <!-- stats -->
     <div class="grid grid-cols-3 gap-4 mb-10">
         <div class="bg-white rounded-2xl border border-ink/10 p-5">
             <div class="font-display text-3xl font-semibold"><%= blogs.length %></div>
@@ -17,11 +18,45 @@
             <div class="text-sm text-ink/50">Published</div>
         </div>
         <div class="bg-white rounded-2xl border border-ink/10 p-5">
-            <div class="font-display text-3xl font-semibold text-clay"><%= blogs.filter(b=>!b.isPublished).length %></div>
-            <div class="text-sm text-ink/50">Drafts</div>
+            <div class="font-display text-3xl font-semibold"><%= users.length %></div>
+            <div class="text-sm text-ink/50">Users</div>
         </div>
     </div>
 
+    <!-- ===== Users ===== -->
+    <div class="bg-white rounded-2xl border border-ink/10 overflow-hidden mb-12">
+        <div class="px-5 py-4 border-b border-ink/10 flex items-center justify-between">
+            <h2 class="font-display text-xl font-semibold">All users</h2>
+            <span class="text-sm text-ink/45"><%= users.length %> total</span>
+        </div>
+        <div class="divide-y divide-ink/5 max-h-[420px] overflow-y-auto">
+            <% users.forEach(function(u) { %>
+                <div class="flex items-center gap-3 px-5 py-3">
+                    <img src="<%= u.avatar %>" alt="" class="w-9 h-9 rounded-full object-cover bg-ink/5 ring-1 ring-ink/10" />
+                    <div class="min-w-0 flex-1">
+                        <div class="font-medium text-sm truncate"><%= u.fullName %></div>
+                        <div class="text-xs text-ink/45 truncate"><%= u.email %></div>
+                    </div>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full
+                        <% if (u.role === 'superadmin') { %> bg-clay/10 text-clay
+                        <% } else if (u.role === 'admin') { %> bg-moss/10 text-moss
+                        <% } else { %> bg-ink/8 text-ink/50 <% } %>">
+                        <%= u.role === 'user' ? 'member' : u.role %>
+                    </span>
+                    <!-- admins can only remove regular members -->
+                    <% if (u.role === 'user') { %>
+                        <button data-id="<%= u.id %>" data-name="<%= u.fullName %>"
+                            class="delUserBtn text-clay/70 hover:text-clay text-sm font-medium">Remove</button>
+                    <% } else { %>
+                        <span class="w-[52px]"></span>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <!-- ===== All stories ===== -->
+    <h2 class="font-display text-2xl font-semibold mb-6">All stories</h2>
     <div class="bg-white rounded-2xl border border-ink/10 overflow-hidden">
         <table class="w-full text-sm">
             <thead>
@@ -56,3 +91,18 @@
 
 <%- include('../partials/ui-helpers') %>
 <%- include('../partials/delete-script') %>
+<script>
+    // remove member (admins can only remove regular members)
+    document.querySelectorAll(".delUserBtn").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+            if (!confirm(`Remove ${btn.dataset.name}? This deletes their account and content.`)) return;
+            const original = btn.textContent;
+            btn.disabled = true; btn.textContent = "…";
+            try {
+                const res = await fetch(`/api/v1/admin/users/${btn.dataset.id}`, { method: "DELETE" });
+                if (res.ok) { location.reload(); }
+                else { const d = await res.json(); toast(d.message || "Couldn't remove user."); btn.disabled = false; btn.textContent = original; }
+            } catch { toast("Network error."); btn.disabled = false; btn.textContent = original; }
+        });
+    });
+</script>
