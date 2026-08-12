@@ -1,0 +1,63 @@
+<div class="max-w-md mx-auto px-5 py-16">
+    <div class="text-center mb-10">
+        <h1 class="font-display text-4xl font-semibold mb-2">Welcome back</h1>
+        <p class="text-ink/50">Sign in to keep writing.</p>
+    </div>
+
+    <form id="loginForm" class="space-y-5">
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">Email</label>
+            <input name="email" type="email" required autocomplete="email"
+                class="w-full bg-white border border-ink/15 rounded-xl px-4 py-3 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">Password</label>
+            <input name="password" type="password" required autocomplete="current-password"
+                class="w-full bg-white border border-ink/15 rounded-xl px-4 py-3 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+        </div>
+        <button type="submit" id="submitBtn" data-loading-text="Signing in…"
+            class="w-full bg-ink text-paper font-medium py-3 rounded-xl hover:bg-moss transition">
+            Sign in
+        </button>
+    </form>
+
+    <p class="text-sm text-ink/50 mt-8 text-center">
+        New to BlogNest?
+        <a href="/register" class="text-moss font-medium hover:underline">Create an account</a>
+    </p>
+</div>
+
+<%- include('../partials/ui-helpers') %>
+<script>
+    const form = document.getElementById("loginForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(submitBtn, true);
+
+        try {
+            const res = await fetch("/api/v1/users/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: form.email.value,
+                    password: form.password.value,
+                }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast(data.message || "Couldn't sign in. Check your details.");
+                setLoading(submitBtn, false);
+                return;
+            }
+
+            toast("Signed in", "success");
+            setTimeout(() => (window.location.href = "/dashboard"), 400);
+        } catch (err) {
+            toast("Network error. Please try again.");
+            setLoading(submitBtn, false);
+        }
+    });
+</script>
