@@ -1,0 +1,96 @@
+<div class="max-w-2xl mx-auto px-5 py-12">
+    <h1 class="font-display text-4xl font-semibold mb-8">
+        <%= blog ? "Edit story" : "Write a new story" %>
+    </h1>
+
+    <form id="blogForm" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">Title</label>
+            <input name="title" type="text" required value="<%= blog ? blog.title : '' %>"
+                placeholder="A memorable headline"
+                class="w-full bg-white border border-ink/15 rounded-xl px-4 py-3 text-lg outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">Category</label>
+            <select name="category" required
+                class="w-full bg-white border border-ink/15 rounded-xl px-4 py-3 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition">
+                <option value="" disabled <%= blog ? '' : 'selected' %>>Choose a category</option>
+                <% ['Education','Travel','Technology','Lifestyle','Food','Business','Health'].forEach(function(c) { %>
+                    <option value="<%= c %>" <%= (blog && blog.category === c) ? 'selected' : '' %>><%= c %></option>
+                <% }); %>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">Story</label>
+            <textarea name="description" rows="12" required
+                placeholder="Tell your story…"
+                class="w-full bg-white border border-ink/15 rounded-xl px-4 py-3 leading-relaxed outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition"><%= blog ? blog.description : '' %></textarea>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-ink/70 mb-1.5">
+                Cover image <%= blog ? '<span class="text-ink/40 font-normal">(leave empty to keep current)</span>' : '' %>
+            </label>
+            <label class="flex items-center justify-center h-32 bg-white border border-dashed border-ink/25 rounded-xl cursor-pointer hover:border-moss transition">
+                <span id="thumbLabel" class="text-sm text-ink/50">Click to upload an image</span>
+                <input name="thumbnail" type="file" accept="image/*" <%= blog ? '' : 'required' %> class="hidden"
+                    onchange="document.getElementById('thumbLabel').textContent = this.files[0]?.name || 'Click to upload an image'" />
+            </label>
+            <% if (blog) { %>
+                <div class="mt-3 w-32 aspect-square rounded-xl overflow-hidden bg-ink/5">
+                    <img src="<%= blog.thumbnail %>" class="w-full h-full object-cover" />
+                </div>
+            <% } %>
+        </div>
+
+        <% if (blog) { %>
+            <label class="flex items-center gap-2.5 text-sm text-ink/70">
+                <input type="checkbox" name="isPublished" <%= blog.isPublished ? 'checked' : '' %>
+                    class="w-4 h-4 rounded accent-moss" />
+                Published (visible to everyone)
+            </label>
+        <% } %>
+
+        <button type="submit" id="submitBtn" data-loading-text="<%= blog ? 'Saving…' : 'Publishing…' %>"
+            class="bg-ink text-paper font-medium px-8 py-3 rounded-full hover:bg-moss transition">
+            <%= blog ? "Save changes" : "Publish story" %>
+        </button>
+    </form>
+</div>
+
+<div id="pageData" data-is-edit="<%= blog ? 'true' : 'false' %>" data-blog-id="<%= blog ? blog.id : '' %>" hidden></div>
+
+<%- include('../partials/ui-helpers') %>
+<script>
+    const form = document.getElementById("blogForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const pageData = document.getElementById("pageData").dataset;
+    const isEdit = pageData.isEdit === "true";
+    const blogId = pageData.blogId;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(submitBtn, true);
+
+        const formData = new FormData();
+        formData.append("title", form.title.value);
+        formData.append("category", form.category.value);
+        formData.append("description", form.description.value);
+        if (form.thumbnail.files.length > 0) formData.append("thumbnail", form.thumbnail.files[0]);
+        if (isEdit) formData.append("isPublished", form.isPublished.checked);
+
+        const url = isEdit ? `/api/v1/blogs/${blogId}` : "/api/v1/blogs";
+        const method = isEdit ? "PATCH" : "POST";
+
+        try {
+            const res = await fetch(url, { method, body: formData });
+            const data = await res.json();
+            if (!res.ok) { toast(data.message || "Couldn't save story."); setLoading(submitBtn, false); return; }
+            toast(isEdit ? "Changes saved" : "Story published", "success");
+            const id = isEdit ? blogId : data.data.id;
+            setTimeout(() => (window.location.href = `/blogs/${id}`), 500);
+        } catch { toast("Network error."); setLoading(submitBtn, false); }
+    });
+</script>
