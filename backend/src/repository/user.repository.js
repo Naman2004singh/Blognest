@@ -1,5 +1,5 @@
 import { pool } from "../db/index.js";
-import {hashPassword} from "../utils/hashPassword.js";
+import { hashPassword } from "../utils/password.js";
 
 // fields without password and refresh token
 const PUBLIC_FIELDS = "id, email, fullName, avatar, coverImage, role, createdAt, updatedAt";
