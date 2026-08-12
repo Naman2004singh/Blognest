@@ -6,3 +6,6 @@ export const ROLES = Object.freeze({
     ADMIN: "admin",
     SUPERADMIN: "superadmin",
 });
+
+export const DEFAULT_AVATAR =
+    "https://api.dicebear.com/7.x/initials/svg?seed=Admin";
