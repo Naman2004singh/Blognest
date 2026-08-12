@@ -1,0 +1,84 @@
+<!-- Hero -->
+<section class="border-b border-ink/10">
+    <div class="max-w-5xl mx-auto px-5 py-16">
+        <h1 class="font-display text-5xl sm:text-6xl font-semibold leading-[1.05] max-w-2xl">
+            Stories worth <span class="text-moss italic">keeping.</span>
+        </h1>
+        <p class="text-lg text-ink/50 mt-5 max-w-lg">
+            Read and write on the things that matter — from technology to travel.
+        </p>
+    </div>
+</section>
+
+<div class="max-w-5xl mx-auto px-5 py-12">
+
+    <!-- Category filter -->
+    <div class="flex flex-wrap gap-2 mb-10">
+        <button data-cat="all" class="cat-pill px-4 py-1.5 rounded-full text-sm font-medium bg-ink text-paper transition">All</button>
+        <% const cats = ['Education','Travel','Technology','Lifestyle','Food','Business','Health']; %>
+        <% cats.forEach(function(c) { %>
+            <button data-cat="<%= c %>" class="cat-pill px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-ink/15 text-ink/70 hover:border-moss transition"><%= c %></button>
+        <% }); %>
+    </div>
+
+    <% if (blogs.length === 0) { %>
+        <div class="text-center py-20">
+            <p class="font-display text-2xl text-ink/40 mb-3">Nothing here yet.</p>
+            <a href="/blogs/new" class="text-moss font-medium hover:underline">Write the first story →</a>
+        </div>
+    <% } else { %>
+        <div id="blogGrid" class="grid gap-x-8 gap-y-10 sm:grid-cols-2">
+            <% blogs.forEach(function(blog) { %>
+                <article class="blog-card group" data-cat="<%= blog.category %>">
+                    <a href="/blogs/<%= blog.id %>" class="block">
+                        <div class="aspect-[16/10] rounded-2xl overflow-hidden bg-ink/5 mb-4">
+                            <img src="<%= blog.thumbnail %>" alt=""
+                                class="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500" />
+                        </div>
+                        <div class="flex items-center gap-2 text-xs mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-moss/10 text-moss font-medium"><%= blog.category %></span>
+                            <% if (!blog.isPublished) { %>
+                                <span class="px-2.5 py-0.5 rounded-full bg-clay/10 text-clay font-medium">Draft</span>
+                            <% } %>
+                        </div>
+                        <h2 class="font-display text-2xl font-semibold leading-snug mb-2 group-hover:text-moss transition line-clamp-2">
+                            <%= blog.title %>
+                        </h2>
+                        <p class="text-ink/55 text-[15px] leading-relaxed line-clamp-2 mb-3">
+                            <%= blog.description %>
+                        </p>
+                    </a>
+                    <div class="flex items-center gap-3 text-sm text-ink/45">
+                        <span class="font-medium text-ink/70"><%= blog.authorName %></span>
+                        <span>·</span>
+                        <span><%= blog.likeCount %> likes</span>
+                        <span>·</span>
+                        <span><%= blog.commentCount %> comments</span>
+                    </div>
+                </article>
+            <% }); %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    // client-side category filter
+    const pills = document.querySelectorAll(".cat-pill");
+    const cards = document.querySelectorAll(".blog-card");
+    pills.forEach((pill) => {
+        pill.addEventListener("click", () => {
+            const cat = pill.dataset.cat;
+            pills.forEach((p) => {
+                p.classList.remove("bg-ink", "text-paper");
+                p.classList.add("bg-white", "border", "border-ink/15", "text-ink/70");
+            });
+            pill.classList.add("bg-ink", "text-paper");
+            pill.classList.remove("bg-white", "border", "border-ink/15", "text-ink/70");
+
+            cards.forEach((card) => {
+                card.style.display =
+                    cat === "all" || card.dataset.cat === cat ? "" : "none";
+            });
+        });
+    });
+</script>
