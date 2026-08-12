@@ -1,23 +1,33 @@
 import Joi from "joi";
 
+export const CATEGORIES = [
+    "Education",
+    "Travel",
+    "Technology",
+    "Lifestyle",
+    "Food",
+    "Business",
+    "Health",
+];
+
 export const createBlogSchema = Joi.object({
     title: Joi.string().trim().min(3).max(200).required().messages({
         "string.empty": "Title is required",
     }),
     description: Joi.string().trim().min(10).required().messages({
-        "string.empty": "Description is required",
-        "string.min": "Description must be at least 10 characters",
+        "string.empty": "Story is required",
+        "string.min": "Story must be at least 10 characters",
     }),
-    category: Joi.string().trim().min(2).max(50).required().messages({
+    category: Joi.string().valid(...CATEGORIES).required().messages({
+        "any.only": "Choose a valid category",
         "string.empty": "Category is required",
     }),
 });
 
-// Update — all optional, but at least one field must be present.
 export const updateBlogSchema = Joi.object({
     title: Joi.string().trim().min(3).max(200),
     description: Joi.string().trim().min(10),
-    category: Joi.string().trim().min(2).max(50),
+    category: Joi.string().valid(...CATEGORIES),
     isPublished: Joi.boolean(),
 }).min(1).messages({
     "object.min": "Provide at least one field to update",
