@@ -69,6 +69,23 @@ const clearRefreshToken = async (id) => {
     await pool.execute(`UPDATE users SET refreshToken = NULL WHERE id = ?`, [id]);
 };
 
+// ---- Admin management ----
+
+const listAllUsers = async () => {
+    const [rows] = await pool.execute(
+        `SELECT ${PUBLIC_FIELDS},
+                (SELECT COUNT(*) FROM blogs WHERE author = users.id) AS blogCount
+        FROM users
+        ORDER BY createdAt DESC`
+    );
+    return rows;
+};
+
+const deleteUser = async (id) => {
+    // ON DELETE CASCADE on blogs/comments/likes cleans up their content.
+    await pool.execute(`DELETE FROM users WHERE id = ?`, [id]);
+};
+
 
 export const userRepository = {
     findById,
@@ -78,5 +95,7 @@ export const userRepository = {
     createUser,
     setRefreshToken,
     clearRefreshToken,
+    listAllUsers,
+    deleteUser,
     PUBLIC_FIELDS,
 };
