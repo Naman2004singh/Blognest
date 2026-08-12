@@ -3,8 +3,7 @@ import { blogRepository } from "../repository/blog.repository.js";
 import { userRepository } from "../repository/user.repository.js";
 import { ROLES } from "../constants.js";
 
-
-// ---- Public -------
+// ---- Public 
 
 export const homePage = asyncHandler(async (req, res) => {
     // staff see all blogs (incl. unpublished); others see published
@@ -32,7 +31,7 @@ export const blogDetailPage = asyncHandler(async (req, res) => {
     res.render("public/blog-detail", { title: blog.title, blog, comments });
 });
 
-// ---- Auth pages -------
+// ---- Auth pages -
 
 export const loginPage = asyncHandler(async (req, res) => {
     if (req.user) return res.redirect("/dashboard");
@@ -44,7 +43,7 @@ export const registerPage = asyncHandler(async (req, res) => {
     res.render("auth/register", { title: "Register" });
 });
 
-// ---- Dashboards ---------
+// ---- Dashboards -
 
 // One entry point that routes each role to its own dashboard view.
 export const dashboardPage = asyncHandler(async (req, res) => {
@@ -62,7 +61,8 @@ export const dashboardPage = asyncHandler(async (req, res) => {
 
     if (role === ROLES.ADMIN) {
         const blogs = await blogRepository.listAllBlogs();
-        return res.render("dashboard/admin", { title: "Admin", blogs });
+        const users = await userRepository.listAllUsers();
+        return res.render("dashboard/admin", { title: "Admin", blogs, users });
     }
 
     // regular user: only their own blogs
@@ -71,7 +71,7 @@ export const dashboardPage = asyncHandler(async (req, res) => {
     res.render("dashboard/user", { title: "Dashboard", blogs: myBlogs });
 });
 
-// ---- Blog create/edit forms -----------
+// ---- Blog create/edit forms ---------
 
 export const newBlogPage = asyncHandler(async (req, res) => {
     res.render("dashboard/blog-form", {

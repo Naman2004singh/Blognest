@@ -12,7 +12,7 @@ const listUsers = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, users, "Users fetched successfully"));
 });
 
-// Create an admin account. Avatar is auto-assigned; the admin can
+// Create an admin account
 const createAdmin = asyncHandler(async (req, res) => {
     const { fullName, email, password } = req.body;
 
@@ -47,8 +47,15 @@ const deleteUser = asyncHandler(async (req, res) => {
     if (!target) {
         throw new ApiError(404, "User not found");
     }
+
+    // super admin is never deletable, by anyone
     if (target.role === ROLES.SUPERADMIN) {
         throw new ApiError(403, "A super admin cannot be deleted");
+    }
+
+    // an admin may only remove regular members
+    if (req.user.role === ROLES.ADMIN && target.role !== ROLES.USER) {
+        throw new ApiError(403, "Admins can only remove members");
     }
 
     await userRepository.deleteUser(targetId);
