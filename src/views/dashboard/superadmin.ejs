@@ -1,0 +1,146 @@
+<div class="max-w-5xl mx-auto px-5 py-12">
+    <div class="flex items-center justify-between mb-10">
+        <div>
+            <h1 class="font-display text-4xl font-semibold">Super Admin</h1>
+            <p class="text-ink/50 mt-1">Manage admins, members, and every story.</p>
+        </div>
+        <a href="/blogs/new" class="bg-ink text-paper font-medium px-5 py-2.5 rounded-full hover:bg-moss transition text-sm">Write a story</a>
+    </div>
+
+    <!-- ===== Admin management ===== -->
+    <div class="grid lg:grid-cols-5 gap-6 mb-12">
+        <!-- Create admin form -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-ink/10 p-6 h-fit">
+            <h2 class="font-display text-xl font-semibold mb-1">Create an admin</h2>
+            <p class="text-ink/50 text-sm mb-5">They'll sign in with these details and can change their avatar later.</p>
+
+            <form id="createAdminForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-ink/70 mb-1.5">Full name</label>
+                    <input name="fullName" type="text" required
+                        class="w-full bg-paper border border-ink/15 rounded-xl px-3.5 py-2.5 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink/70 mb-1.5">Email</label>
+                    <input name="email" type="email" required
+                        class="w-full bg-paper border border-ink/15 rounded-xl px-3.5 py-2.5 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink/70 mb-1.5">Temporary password</label>
+                    <input name="password" type="text" required minlength="6"
+                        class="w-full bg-paper border border-ink/15 rounded-xl px-3.5 py-2.5 outline-none focus:border-moss focus:ring-2 focus:ring-moss/20 transition" />
+                    <p class="text-xs text-ink/40 mt-1">Shown as text so you can copy and share it.</p>
+                </div>
+                <button type="submit" id="createAdminBtn" data-loading-text="Creating…"
+                    class="w-full bg-moss text-white font-medium py-2.5 rounded-xl hover:bg-moss-dark transition">
+                    Create admin
+                </button>
+            </form>
+        </div>
+
+        <!-- Users list -->
+        <div class="lg:col-span-3 bg-white rounded-2xl border border-ink/10 overflow-hidden">
+            <div class="px-5 py-4 border-b border-ink/10 flex items-center justify-between">
+                <h2 class="font-display text-xl font-semibold">All users</h2>
+                <span class="text-sm text-ink/45"><%= users.length %> total</span>
+            </div>
+            <div class="divide-y divide-ink/5 max-h-[420px] overflow-y-auto">
+                <% users.forEach(function(u) { %>
+                    <div class="flex items-center gap-3 px-5 py-3">
+                        <img src="<%= u.avatar %>" alt="" class="w-9 h-9 rounded-full object-cover bg-ink/5 ring-1 ring-ink/10" />
+                        <div class="min-w-0 flex-1">
+                            <div class="font-medium text-sm truncate"><%= u.fullName %></div>
+                            <div class="text-xs text-ink/45 truncate"><%= u.email %></div>
+                        </div>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full
+                            <% if (u.role === 'superadmin') { %> bg-clay/10 text-clay
+                            <% } else if (u.role === 'admin') { %> bg-moss/10 text-moss
+                            <% } else { %> bg-ink/8 text-ink/50 <% } %>">
+                            <%= u.role === 'user' ? 'member' : u.role %>
+                        </span>
+                        <% if (u.role !== 'superadmin') { %>
+                            <button data-id="<%= u.id %>" data-name="<%= u.fullName %>"
+                                class="delUserBtn text-clay/70 hover:text-clay text-sm font-medium">Remove</button>
+                        <% } else { %>
+                            <span class="w-[52px]"></span>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== All stories ===== -->
+    <h2 class="font-display text-2xl font-semibold mb-6">All stories</h2>
+    <div class="bg-white rounded-2xl border border-ink/10 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-ink/50 border-b border-ink/10">
+                    <th class="py-3 px-5 font-medium">Story</th>
+                    <th class="py-3 px-5 font-medium">Author</th>
+                    <th class="py-3 px-5 font-medium">Category</th>
+                    <th class="py-3 px-5 font-medium">Status</th>
+                    <th class="py-3 px-5 font-medium text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% blogs.forEach(function(blog) { %>
+                    <tr class="border-b border-ink/5 last:border-0 hover:bg-paper/60 transition">
+                        <td class="py-3 px-5"><a href="/blogs/<%= blog.id %>" class="font-medium hover:text-moss transition line-clamp-1"><%= blog.title %></a></td>
+                        <td class="py-3 px-5 text-ink/60"><%= blog.authorName %></td>
+                        <td class="py-3 px-5"><span class="px-2.5 py-0.5 rounded-full bg-moss/10 text-moss text-xs font-medium"><%= blog.category %></span></td>
+                        <td class="py-3 px-5">
+                            <% if (blog.isPublished) { %><span class="text-moss font-medium">Published</span>
+                            <% } else { %><span class="text-clay font-medium">Draft</span><% } %>
+                        </td>
+                        <td class="py-3 px-5 text-right whitespace-nowrap">
+                            <a href="/blogs/<%= blog.id %>/edit" class="text-ink/60 hover:text-moss font-medium">Edit</a>
+                            <button data-id="<%= blog.id %>" class="delBtn text-clay hover:underline font-medium ml-3">Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('../partials/ui-helpers') %>
+<%- include('../partials/delete-script') %>
+<script>
+    // ---- create admin ----
+    const caForm = document.getElementById("createAdminForm");
+    const caBtn = document.getElementById("createAdminBtn");
+    caForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(caBtn, true);
+        try {
+            const res = await fetch("/api/v1/admin/admins", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fullName: caForm.fullName.value,
+                    email: caForm.email.value,
+                    password: caForm.password.value,
+                }),
+            });
+            const data = await res.json();
+            if (!res.ok) { toast(data.message || "Couldn't create admin."); setLoading(caBtn, false); return; }
+            toast("Admin created — share the login details", "success");
+            setTimeout(() => location.reload(), 900);
+        } catch { toast("Network error."); setLoading(caBtn, false); }
+    });
+
+    // ---- remove user ----
+    document.querySelectorAll(".delUserBtn").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+            if (!confirm(`Remove ${btn.dataset.name}? This deletes their account and content.`)) return;
+            const original = btn.textContent;
+            btn.disabled = true; btn.textContent = "…";
+            try {
+                const res = await fetch(`/api/v1/admin/users/${btn.dataset.id}`, { method: "DELETE" });
+                if (res.ok) { location.reload(); }
+                else { const d = await res.json(); toast(d.message || "Couldn't remove user."); btn.disabled = false; btn.textContent = original; }
+            } catch { toast("Network error."); btn.disabled = false; btn.textContent = original; }
+        });
+    });
+</script>
