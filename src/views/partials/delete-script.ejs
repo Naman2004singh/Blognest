@@ -1,0 +1,16 @@
+<script>
+    // shared delete for dashboard rows (class="delBtn" + data-id)
+    document.querySelectorAll(".delBtn").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+            if (!confirm("Delete this story permanently?")) return;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="border-top-color:#c05f3c;border-color:rgba(192,95,60,.3);border-top-color:#c05f3c"></span>';
+            try {
+                const res = await fetch(`/api/v1/blogs/${btn.dataset.id}`, { method: "DELETE" });
+                if (res.ok) { location.reload(); }
+                else { toast("Couldn't delete — check your permissions."); btn.disabled = false; btn.innerHTML = original; }
+            } catch { toast("Network error."); btn.disabled = false; btn.innerHTML = original; }
+        });
+    });
+</script>
