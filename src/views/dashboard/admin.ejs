@@ -1,0 +1,58 @@
+<div class="max-w-5xl mx-auto px-5 py-12">
+    <div class="flex items-center justify-between mb-10">
+        <div>
+            <h1 class="font-display text-4xl font-semibold">Admin</h1>
+            <p class="text-ink/50 mt-1">Manage every story on BlogNest.</p>
+        </div>
+        <a href="/blogs/new" class="bg-ink text-paper font-medium px-5 py-2.5 rounded-full hover:bg-moss transition text-sm">Write a story</a>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 mb-10">
+        <div class="bg-white rounded-2xl border border-ink/10 p-5">
+            <div class="font-display text-3xl font-semibold"><%= blogs.length %></div>
+            <div class="text-sm text-ink/50">Total stories</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-ink/10 p-5">
+            <div class="font-display text-3xl font-semibold text-moss"><%= blogs.filter(b=>b.isPublished).length %></div>
+            <div class="text-sm text-ink/50">Published</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-ink/10 p-5">
+            <div class="font-display text-3xl font-semibold text-clay"><%= blogs.filter(b=>!b.isPublished).length %></div>
+            <div class="text-sm text-ink/50">Drafts</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-ink/10 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-ink/50 border-b border-ink/10">
+                    <th class="py-3 px-5 font-medium">Story</th>
+                    <th class="py-3 px-5 font-medium">Author</th>
+                    <th class="py-3 px-5 font-medium">Category</th>
+                    <th class="py-3 px-5 font-medium">Status</th>
+                    <th class="py-3 px-5 font-medium text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% blogs.forEach(function(blog) { %>
+                    <tr class="border-b border-ink/5 last:border-0 hover:bg-paper/60 transition">
+                        <td class="py-3 px-5"><a href="/blogs/<%= blog.id %>" class="font-medium hover:text-moss transition line-clamp-1"><%= blog.title %></a></td>
+                        <td class="py-3 px-5 text-ink/60"><%= blog.authorName %></td>
+                        <td class="py-3 px-5"><span class="px-2.5 py-0.5 rounded-full bg-moss/10 text-moss text-xs font-medium"><%= blog.category %></span></td>
+                        <td class="py-3 px-5">
+                            <% if (blog.isPublished) { %><span class="text-moss font-medium">Published</span>
+                            <% } else { %><span class="text-clay font-medium">Draft</span><% } %>
+                        </td>
+                        <td class="py-3 px-5 text-right whitespace-nowrap">
+                            <a href="/blogs/<%= blog.id %>/edit" class="text-ink/60 hover:text-moss font-medium">Edit</a>
+                            <button data-id="<%= blog.id %>" class="delBtn text-clay hover:underline font-medium ml-3">Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('../partials/ui-helpers') %>
+<%- include('../partials/delete-script') %>
