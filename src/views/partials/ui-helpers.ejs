@@ -1,0 +1,47 @@
+
+<div id="toastHost" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+<script>
+    // ---- button loading state ----
+    function setLoading(btn, isLoading) {
+        if (!btn) return;
+        if (isLoading) {
+            btn.dataset.label = btn.innerHTML;
+            btn.disabled = true;
+            btn.classList.add("opacity-80", "cursor-not-allowed");
+            btn.innerHTML =
+                '<span class="inline-flex items-center gap-2">' +
+                '<span class="spinner"></span>' +
+                '<span>' + (btn.dataset.loadingText || "Working…") + "</span></span>";
+        } else {
+            btn.disabled = false;
+            btn.classList.remove("opacity-80", "cursor-not-allowed");
+            if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
+        }
+    }
+
+    // ---- toast notifications ----
+    function toast(message, type = "error") {
+        const host = document.getElementById("toastHost");
+        const el = document.createElement("div");
+        const color =
+            type === "success"
+                ? "bg-moss text-white"
+                : type === "info"
+                ? "bg-ink text-white"
+                : "bg-clay text-white";
+        el.className =
+            color +
+            " px-4 py-3 rounded-xl shadow-lg text-sm font-medium max-w-xs " +
+            "translate-x-4 opacity-0 transition-all duration-300";
+        el.textContent = message;
+        host.appendChild(el);
+        requestAnimationFrame(() => {
+            el.classList.remove("translate-x-4", "opacity-0");
+        });
+        setTimeout(() => {
+            el.classList.add("translate-x-4", "opacity-0");
+            setTimeout(() => el.remove(), 300);
+        }, 3500);
+    }
+</script>
