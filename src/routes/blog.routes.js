@@ -13,11 +13,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { optionalJWT } from "../middlewares/optionalAuth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import {
-    createBlogSchema,
-    updateBlogSchema,
-    commentSchema,
-} from "../validators/blog.validators.js";
+import { createBlogSchema, updateBlogSchema, commentSchema } from "../validators/blog.validators.js";
 
 const router = Router();
 

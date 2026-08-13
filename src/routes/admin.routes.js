@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-    listUsers,
-    createAdmin,
-    deleteUser,
-} from "../controllers/admin.controller.js";
+import { listUsers, createAdmin, deleteUser } from "../controllers/admin.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";

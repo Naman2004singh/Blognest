@@ -43,6 +43,10 @@ app.use(cookieParser())
 import { attachUser } from "./middlewares/viewAuth.middleware.js";
 app.use(attachUser);
 
+// ---- Page Routes (server-rendered EJS)
+import viewRouter from "./routes/view.routes.js";
+app.use("/", viewRouter);
+
     // routes import
 import userRouter from "./routes/user.routes.js";
 import blogRouter from "./routes/blog.routes.js"
@@ -52,9 +56,11 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/admin", adminRouter);
 
-// ---- Page Routes (server-rendered EJS)
-import viewRouter from "./routes/view.routes.js";
-app.use("/", viewRouter);
+    // for the uptime robot route
+app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+});
+
 
 app.use((err, req, res, next) => {
     const statusCode = err instanceof ApiError ? err.statusCode : 500;

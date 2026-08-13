@@ -12,17 +12,17 @@ import { requireLogin } from "../middlewares/viewAuth.middleware.js";
 
 const router = Router();
 
-// ---- Public pages -------------------------------------------
+// ---- Public pages -----------
 router.get("/", homePage);
 router.get("/login", loginPage);
 router.get("/register", registerPage);
 
-// ---- Protected pages ----------------------------------------
+// ---- Protected pages -------
 router.get("/dashboard", requireLogin, dashboardPage);
 router.get("/blogs/new", requireLogin, newBlogPage);
 router.get("/blogs/:id/edit", requireLogin, editBlogPage);
 
-// Public blog detail (kept last so /blogs/new isn't caught by /blogs/:id)
+// Public blog detail
 router.get("/blogs/:id", blogDetailPage);
 
 export default router;
