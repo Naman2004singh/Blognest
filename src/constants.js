@@ -9,3 +9,14 @@ export const ROLES = Object.freeze({
 
 export const DEFAULT_AVATAR =
     "https://api.dicebear.com/7.x/initials/svg?seed=Admin";
+
+
+export const CATEGORIES = [
+    "Education",
+    "Travel",
+    "Technology",
+    "Lifestyle",
+    "Food",
+    "Business",
+    "Health",
+];

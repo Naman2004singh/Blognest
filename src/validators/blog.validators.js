@@ -1,14 +1,5 @@
 import Joi from "joi";
-
-export const CATEGORIES = [
-    "Education",
-    "Travel",
-    "Technology",
-    "Lifestyle",
-    "Food",
-    "Business",
-    "Health",
-];
+import { CATEGORIES } from "../constants.js";
 
 export const createBlogSchema = Joi.object({
     title: Joi.string().trim().min(3).max(200).required().messages({
